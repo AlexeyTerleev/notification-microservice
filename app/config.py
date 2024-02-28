@@ -9,6 +9,7 @@ class RabbitMQSettings(BaseModel):
     RABBIT_PORT: str
 
     RESET_PASSWORD_QUEUE: str = "reset-password-stream"
+    DEAD_LETTER_QUEUE: str = "dead-letter"
 
     def get_url(self):
         return f"amqp://{self.RABBIT_USER}:{self.RABBIT_PASS}@{self.RABBIT_HOST}:{self.RABBIT_PORT}/"
