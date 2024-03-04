@@ -34,8 +34,6 @@ class MongoDBSettings(BaseModel):
     def get_url(self):
         return f"mongodb://{self.MONGO_USER}:{self.MONGO_PASS}@{self.MONGO_HOST}:{self.MONGO_PORT}/?authSource={settings.mongo_db.MONGO_AUTH_SRC}"
 
-# "mongodb://admin:password@notification-mongodb:27017/?authSource=admin"
-# rs.initiate({_id:'rs0',members:[{_id:0,host:'notification-mongodb:27017'}]})
     
 class AWS(BaseModel):
     AWS_URL: str
