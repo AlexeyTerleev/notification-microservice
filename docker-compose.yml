@@ -1,20 +1,29 @@
 version: '3.7'
 services:
+
   notification-mongodb:
     container_name: "notification-mongodb"
-    image: mongo:latest
+    image: mongo:7.0
+    command: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/data/replica.key", "--port", "27017"]
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'notification-mongodb:27017'}]}) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      start_period: 0s
+      start_interval: 1s
+      retries: 30
+    volumes:
+      - "mongo_data:/data/db"
+      - "mongo_config:/data/configdb"
+      - $PWD/replica.key:/data/replica.key
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - 27017:27017
-    volumes:
-      - mongodb_data_container:/data/db
     networks:
       - innotter-micro-service_internship-net
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-  
+    
   notification-rabbitmq3:
     container_name: "notification-rabbitmq"
     image: rabbitmq:3.8-management-alpine
@@ -29,8 +38,8 @@ services:
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "ping"]
   
-  notitficattion-listener:
-    container_name: notitficattion-listener
+  notification-listener:
+    container_name: notification-listener
     build: 
       context: .
       network: host
@@ -48,7 +57,8 @@ services:
 
 
 volumes:
-  mongodb_data_container:
+  mongo_data:
+  mongo_config:
 
 networks:
   innotter-micro-service_internship-net:
