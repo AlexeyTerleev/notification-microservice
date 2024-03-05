@@ -31,7 +31,8 @@ class MongoDBSettings(BaseModel):
     MONGO_PORT: str
     MONGO_AUTH_SRC: str
 
-    def get_url(self):
+    @property
+    def url(self):
         return f"mongodb://{self.MONGO_USER}:{self.MONGO_PASS}@{self.MONGO_HOST}:{self.MONGO_PORT}/?authSource={settings.mongo_db.MONGO_AUTH_SRC}"
 
     

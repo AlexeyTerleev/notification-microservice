@@ -25,7 +25,7 @@ class ConsumeService:
 
         self.email_service = EmailService()
         self.mongo_client = motor.motor_asyncio.AsyncIOMotorClient(
-            settings.mongo_db.get_url(), 
+            settings.mongo_db.url, 
             read_preference=pymongo.ReadPreference.PRIMARY
         )
 
@@ -55,7 +55,7 @@ class ConsumeService:
         payload = bson.decode(message.body)
         session = await self.mongo_client.start_session()
         try:
-            await self.execute_transection(session, payload)
+            await self.execute_transaction(session, payload)
         except Exception as e:
             raise e
         finally:
@@ -72,7 +72,7 @@ class ConsumeService:
             await self.move_to_dead_letter_queue(message)
             await message.reject()
 
-    async def execute_transection(self, session, payload):
+    async def execute_transaction(self, session, payload):
         collection = self.mongo_client.main_db.reset_password
         session.start_transaction()
         try: 
